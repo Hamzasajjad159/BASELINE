@@ -9,6 +9,7 @@ import { loadSamples } from './io/loadSample';
 import { readBomFile } from './io/readFile';
 import ConfigCompare from './ui/ConfigCompare';
 import DiffTable from './ui/DiffTable';
+import ExportBar from './ui/ExportBar';
 import Header from './ui/Header';
 import RowDetailDrawer from './ui/RowDetailDrawer';
 import SummaryCards from './ui/SummaryCards';
@@ -165,6 +166,32 @@ export default function App() {
 
       {result && (
         <>
+          {slots.a.status === 'loaded' &&
+            slots.b.status === 'loaded' &&
+            validationA &&
+            validationB && (
+              <ExportBar
+                result={result}
+                meta={{
+                  a: {
+                    fileName: slots.a.file.fileName,
+                    checksum: slots.a.file.checksum,
+                    rows: validationA.dataRowCount,
+                    rowsCompared: validationA.rows.length,
+                    issues: validationA.issues,
+                  },
+                  b: {
+                    fileName: slots.b.file.fileName,
+                    checksum: slots.b.file.checksum,
+                    rows: validationB.dataRowCount,
+                    rowsCompared: validationB.rows.length,
+                    issues: validationB.issues,
+                  },
+                  crossFile,
+                  options: { stripLeadingZeros, ignoreFields },
+                }}
+              />
+            )}
           <SummaryCards
             result={result}
             active={filter.type}

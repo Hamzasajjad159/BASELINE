@@ -52,6 +52,7 @@ src/
     Header.tsx
     labels.ts         # display labels and status colors
     Delta.tsx         # "before → after" with the before value struck through
+    ExportBar.tsx     # CSV / Excel report download
     UploadPanel.tsx
     ValidationPanel.tsx
     SummaryCards.tsx
@@ -220,10 +221,12 @@ interface RowChange {
    - Changed cells show the value as `before → after`, with the before value struck through.
    - Filters: change type, configuration, parent, and a text search. There is a toggle to show unchanged rows, and toggles to ignore field change types (e.g. ATTRIBUTE_CHANGED).
    - Clicking a row opens a drawer with the full A and B rows side by side (raw values and source row numbers).
-7. **Export** the diff report as CSV or XLSX. The XLSX has three sheets:
-   - Summary: file names, SHA-256 checksums, row counts, timestamp, options used, assembly revision A→B, counts
-   - Changes
-   - Warnings
+7. **Export** the diff report as CSV or XLSX (`ExportBar`). Both come from `domain/report.ts` (`buildReport`), respect the current ignore settings, and include unchanged rows only when asked.
+   - CSV: the summary as `#` comment lines, then the Changes table (one file).
+   - XLSX has three sheets, all cells written as text:
+     - Summary: file names, SHA-256 checksums, row counts, timestamp, options used, assembly revision A→B, counts
+     - Changes: status, severity, configuration, part, A/B values for parent, find no., quantity, UoM and revision, change types, a readable change description, source rows
+     - Warnings: validation issues for A, B and both, plus diff warnings
 
 ## Non-goals for this MVP
 
