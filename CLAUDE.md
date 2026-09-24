@@ -144,6 +144,8 @@ Duplicate groups (same key with more than one row left after deduplication) are 
 2. Pair the remaining rows by fewest differing fields, using source order as the tie-break.
 3. Emit a warning for the group.
 
+If step 2 would need more than `MAX_PAIRING_COMPARISONS` (250,000) row comparisons (one part repeated 500+ times under one parent), the remaining rows are paired in source order instead, so the diff stays fast.
+
 ## Diff model (`types.ts` / `diff.ts`)
 
 Every matched or unmatched row produces one `RowChange` with a **row status** and a `fields[]` list of field changes:
