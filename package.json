@@ -13,7 +13,8 @@
     "typecheck": "tsc -b",
     "test": "vitest run",
     "test:watch": "vitest",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "samples": "node scripts/build-samples.mjs"
   },
   "dependencies": {
     "@types/papaparse": "^5.5.2",
