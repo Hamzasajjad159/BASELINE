@@ -22,7 +22,8 @@ Design principle: the diff engine compares two normalized snapshots, whatever th
 - `exceljs` for XLSX: parsing uploads, the template download, and the report export. Load it with a dynamic `import()` so it stays out of the initial bundle. (SheetJS is not used: the npm copy, 0.18.5, has known vulnerabilities, and its CDN is not reachable from the build environment.) `package.json` overrides `uuid` to `^11.1.1` to clear a moderate advisory in exceljs's transitive dependency.
 - `@tanstack/react-virtual` for the diff table
 - Vitest + `@vitest/coverage-v8`. `src/domain/**` has a 100% coverage threshold, enforced by `npm run coverage`.
-- GitHub Actions CI (`.github/workflows/ci.yml`) runs lint, format check, coverage and build. It has no deploy step yet.
+- GitHub Actions CI (`.github/workflows/ci.yml`) runs lint, format check, coverage and build on every push and PR.
+- Deployment: `.github/workflows/deploy.yml` re-runs lint, coverage and build, then publishes `dist/` to GitHub Pages on every push to `main` (or manually via workflow_dispatch). Live at https://hamzasajjad159.github.io/BASELINE/. Requires repo Settings → Pages → Source: GitHub Actions.
 - No server. Everything runs in the browser, and the app deploys as static files (`base: './'`).
 
 ## Folder structure
@@ -234,7 +235,7 @@ interface RowChange {
 
 ## Non-goals for this MVP
 
-No backend, no login, no database, no ERP/CAD connectors, no trust score, no procurement drafts, no notifications, no editing of BOM data, no deploy pipeline (yet).
+No backend, no login, no database, no ERP/CAD connectors, no trust score, no procurement drafts, no notifications, no editing of BOM data.
 
 ## Build order (do one phase at a time; stop for review after each)
 

@@ -1,5 +1,7 @@
 # Baseline — BOM Compare
 
+**Live app: https://hamzasajjad159.github.io/BASELINE/**
+
 Compare two bills of materials and see every change: added, removed, moved and changed rows, with the before and after value of each field. Everything runs in the browser, so files are never uploaded anywhere.
 
 ## Using it
@@ -34,6 +36,6 @@ npm run build      # type-check and build static files into dist/
 npm run samples    # rebuild the XLSX samples from the CSV samples
 ```
 
-The build is a static site with relative paths, so `dist/` can be served from any host or sub-path (GitHub Pages, S3, a file share). CI runs lint, format check, coverage and build on every push.
+The build is a static site with relative paths, so `dist/` can be served from any host or sub-path. CI runs lint, format check, coverage and build on every push, and every push to `main` is deployed to GitHub Pages by `.github/workflows/deploy.yml`.
 
 Stack: Vite, React, TypeScript (strict), Tailwind CSS, papaparse, ExcelJS (loaded only when needed), TanStack Virtual, Vitest.
