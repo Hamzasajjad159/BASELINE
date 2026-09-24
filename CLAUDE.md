@@ -69,6 +69,9 @@ tests/
   parseCsv.test.ts
   parseXlsx.test.ts
   perf.test.ts        # 5,000-row diff < 1 s
+  samples.test.ts     # sample files trigger every change type; XLSX/CSV parity
+  report.test.ts      # report tables, CSV and XLSX export
+  view.test.ts        # table filtering
 public/samples/
   sample_version_A.csv / .xlsx
   sample_version_B.csv / .xlsx   # hand-crafted to trigger every change type
@@ -122,7 +125,8 @@ Apply the same rules to both snapshots before any comparison:
 
 Validation blocks the comparison only on file-level errors. Row-level problems are listed and the user can proceed.
 
-- File level (per file): missing required columns (after alias resolution), zero data rows, or more than one assembly_number in a file.
+- File level (per file): empty file (one EMPTY_FILE error), no recognized headers at all (one NO_RECOGNIZED_COLUMNS error listing a few of the headers found), missing required columns (after alias resolution), zero data rows, or more than one assembly_number in a file. Header errors point the user to the templates.
+- Files that cannot be opened at all (corrupt or password-protected XLSX) raise `UnreadableFileError` with a plain-language message; the library error is kept as `cause`.
 - Cross-file: A and B have different assembly_number values. This is an error and blocks the comparison.
 - Row level: missing required value, non-numeric or non-positive quantity, bad level, bad date, effectivity_end earlier than effectivity_start, make_buy not MAKE/BUY. Rows missing configuration_name, parent_part_number or part_number cannot be matched and are excluded from the comparison (the message says so).
 - Row level (structure warnings): parent_part_number does not appear as a part_number (or as the assembly_number) in the same configuration; a child's level is not its parent's level + 1.
@@ -241,7 +245,7 @@ No backend, no login, no database, no ERP/CAD connectors, no trust score, no pro
 5. **Sample data**: A and B files (CSV + XLSX) that trigger every change type at least once. 30–60 rows, 2 main configurations (plus one only in A and one only in B, for CONFIG_REMOVED / CONFIG_ADDED), 3 levels, and one repeated subassembly. `tests/samples.test.ts` enforces all of this.
 6. **UI**: upload → validation → summary → config compare → diff table → drawer.
 7. **Export** the report as CSV and XLSX.
-8. **Polish**: empty states, error messages, and a perf test (5,000 rows diff in under 1 s in Vitest). Also check table scrolling manually.
+8. **Polish**: empty states, error messages, and a perf test (5,000 rows diff in under 1 s in Vitest). Also check table scrolling manually. Measured in headless Chromium: two 5,000-row files load and validate in ~0.5 s, compare and render in ~0.2 s, and the table scrolls at 60 fps with ~30–40 rows in the DOM.
 
 ## Conventions
 

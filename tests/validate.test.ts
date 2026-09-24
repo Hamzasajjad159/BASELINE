@@ -229,3 +229,40 @@ describe('toSnapshot', () => {
     });
   });
 });
+
+describe('validateFile — unusable files', () => {
+  it('reports an empty file once', () => {
+    const v = validateFile({ headers: [], rows: [], sourceRows: [], parseWarnings: [] });
+    expect(v.issues.map((i) => i.code)).toEqual(['EMPTY_FILE']);
+    expect(v.blocking).toBe(true);
+  });
+
+  it('reports a file whose headers are all unrecognized once, with a sample of them', () => {
+    const headers = ['Name', 'Email', 'Phone', 'City', 'Zip', 'Country'];
+    const v = validateFile({
+      headers,
+      rows: [{ Name: 'x' }],
+      sourceRows: [2],
+      parseWarnings: [],
+    });
+    expect(v.issues.map((i) => i.code)).toEqual(['NO_RECOGNIZED_COLUMNS']);
+    expect(v.issues[0]?.message).toContain('found: Name, Email, Phone, City, Zip, …');
+    expect(v.blocking).toBe(true);
+  });
+
+  it('lists up to five unrecognized headers without an ellipsis', () => {
+    const v = validateFile({
+      headers: ['Foo', 'Bar'],
+      rows: [],
+      sourceRows: [],
+      parseWarnings: [],
+    });
+    expect(v.issues[0]?.message).toContain('found: Foo, Bar)');
+    expect(v.issues.map((i) => i.code)).toEqual(['NO_RECOGNIZED_COLUMNS', 'NO_ROWS']);
+  });
+
+  it('adds a template hint to missing-column errors', () => {
+    const v = validateFile(table([{}], ['part_number']));
+    expect(v.issues[0]?.message).toContain('Download the CSV or Excel template');
+  });
+});

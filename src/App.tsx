@@ -205,6 +205,7 @@ export default function App() {
           <DiffTable
             rows={visibleRows}
             totalRows={result.rows.length}
+            noDifferences={result.rows.every((r) => r.status === 'UNCHANGED')}
             filter={filter}
             onFilter={setFilter}
             configs={result.configs.map((c) => c.name)}
