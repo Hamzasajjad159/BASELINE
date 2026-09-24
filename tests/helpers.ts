@@ -43,3 +43,18 @@ export function table(rows: Partial<BomRow>[], headers: readonly string[] = COLU
 export function norm(overrides: Partial<BomRow> = {}, sourceRow = 2): NormalizedRow {
   return normalizeRow(bom(overrides), sourceRow);
 }
+
+export function snap(
+  label: 'A' | 'B',
+  rows: Partial<BomRow>[],
+  header: { assemblyNumber?: string; assemblyRevision?: string } = {},
+): import('../src/domain/types').Snapshot {
+  return {
+    label,
+    fileName: `${label}.csv`,
+    checksum: '',
+    assemblyNumber: header.assemblyNumber ?? 'ASM-1',
+    assemblyRevision: header.assemblyRevision ?? 'A',
+    rows: rows.map((r, i) => norm(r, i + 2)),
+  };
+}
