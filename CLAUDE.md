@@ -39,6 +39,7 @@ src/
     csv.ts            # CSV writer with formula-injection guard
     diff.ts           # pure diff engine: (A, B, options) => DiffResult
     report.ts         # DiffResult => report rows (CSV text; sheet data for XLSX)
+    view.ts           # pure table view-model: RowFilter, filterRows, parentOptions
   io/
     parseCsv.ts       # File/text -> RawTable
     parseXlsx.ts      # File/ArrayBuffer -> RawTable (same shape as CSV); sheet "BOM" else first
@@ -46,7 +47,11 @@ src/
     readFile.ts       # dispatch on extension, SHA-256 of raw bytes via crypto.subtle
     downloadTemplate.ts
     exportReport.ts
+    loadSample.ts     # fetches public/samples for "Load sample data"
   ui/
+    Header.tsx
+    labels.ts         # display labels and status colors
+    Delta.tsx         # "before → after" with the before value struck through
     UploadPanel.tsx
     ValidationPanel.tsx
     SummaryCards.tsx

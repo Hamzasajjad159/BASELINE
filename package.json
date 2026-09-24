@@ -17,6 +17,7 @@
     "samples": "node scripts/build-samples.mjs"
   },
   "dependencies": {
+    "@tanstack/react-virtual": "^3.14.13",
     "@types/papaparse": "^5.5.2",
     "exceljs": "^4.4.0",
     "papaparse": "^5.7.0",
