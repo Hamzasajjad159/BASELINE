@@ -4,7 +4,12 @@ import { downloadCsvTemplate, downloadXlsxTemplate } from '../io/downloadTemplat
 const buttonClass =
   'rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-100 disabled:cursor-wait disabled:opacity-60';
 
-export default function Header() {
+interface HeaderProps {
+  onLoadSample: () => void;
+  sampleLoading: boolean;
+}
+
+export default function Header({ onLoadSample, sampleLoading }: HeaderProps) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,6 +40,14 @@ export default function Header() {
           </button>
           <button type="button" className={buttonClass} onClick={onXlsx} disabled={busy}>
             {busy ? 'Preparing…' : 'Download template (Excel)'}
+          </button>
+          <button
+            type="button"
+            className="rounded-md bg-sky-700 px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-sky-600 disabled:cursor-wait disabled:opacity-60"
+            onClick={onLoadSample}
+            disabled={sampleLoading}
+          >
+            {sampleLoading ? 'Loading…' : 'Load sample data'}
           </button>
         </div>
         {error && <p className="text-sm text-red-700">{error}</p>}
