@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { COLUMN_KEYS } from '../src/domain/template';
 import { validateFile } from '../src/domain/validate';
 import { buildXlsxTemplate } from '../src/io/downloadTemplate';
-import { cellToString, parseXlsxBuffer, pickSheet } from '../src/io/parseXlsx';
+import { UnreadableFileError, cellToString, parseXlsxBuffer, pickSheet } from '../src/io/parseXlsx';
 import { fileKind, readBomFile, sha256Hex, UnsupportedFileError } from '../src/io/readFile';
 import { BASE } from './helpers';
 
@@ -109,5 +109,15 @@ describe('readBomFile', () => {
     expect(() => fileKind('old.xls')).toThrow(UnsupportedFileError);
     expect(() => fileKind('old.xls')).toThrow('Save the file as .xlsx');
     expect(() => fileKind('doc.pdf')).toThrow('Unsupported file type ".pdf"');
+  });
+});
+
+describe('unreadable workbooks', () => {
+  it('turns library errors into a friendly message and keeps the cause', async () => {
+    const bytes = new TextEncoder().encode('not a zip').buffer as ArrayBuffer;
+    const err = await parseXlsxBuffer(bytes).catch((e: unknown) => e);
+    expect(err).toBeInstanceOf(UnreadableFileError);
+    expect((err as Error).message).toContain('could not be read as an Excel workbook');
+    expect((err as Error).cause).toBeDefined();
   });
 });

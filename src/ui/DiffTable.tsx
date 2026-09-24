@@ -25,6 +25,8 @@ const IGNORABLE: FieldChangeType[] = [
 interface DiffTableProps {
   rows: readonly RowChange[];
   totalRows: number;
+  /** True when the comparison found no differences at all (not just none after filtering). */
+  noDifferences: boolean;
   filter: RowFilter;
   onFilter: (f: RowFilter) => void;
   configs: readonly string[];
@@ -103,6 +105,7 @@ export default function DiffTable(props: DiffTableProps) {
   const {
     rows,
     totalRows,
+    noDifferences,
     filter,
     onFilter,
     configs,
@@ -233,10 +236,23 @@ export default function DiffTable(props: DiffTableProps) {
             <span>Changed fields</span>
           </div>
           {rows.length === 0 ? (
-            <p className="p-8 text-center text-sm text-slate-500">
-              No rows match these filters.
-              {!filter.showUnchanged && ' Turn on "Show unchanged" to see every row.'}
-            </p>
+            noDifferences ? (
+              <div className="p-8 text-center">
+                <p className="font-medium text-green-800">
+                  No differences found: Version B matches Version A.
+                </p>
+                <p className="mt-1 text-sm text-slate-500">
+                  {ignoreFields.length > 0
+                    ? 'Some change types are being ignored. Clear "Ignore…" to check them too.'
+                    : 'Turn on "Show unchanged" to browse every row.'}
+                </p>
+              </div>
+            ) : (
+              <p className="p-8 text-center text-sm text-slate-500">
+                No rows match these filters.
+                {!filter.showUnchanged && ' Turn on "Show unchanged" to see every row.'}
+              </p>
+            )
           ) : (
             <div ref={scrollRef} role="rowgroup" className="max-h-[70vh] overflow-y-auto">
               <div className="relative" style={{ height: virtualizer.getTotalSize() }}>

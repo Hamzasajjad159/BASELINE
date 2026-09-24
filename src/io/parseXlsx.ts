@@ -2,6 +2,9 @@ import type { CellValue, Workbook, Worksheet } from 'exceljs';
 import type { RawTable } from '../domain/types';
 import { recordsToTable } from './rawTable';
 
+/** A file we could not open at all (as opposed to one with validation problems). */
+export class UnreadableFileError extends Error {}
+
 /** ISO date (YYYY-MM-DD) of a Date as stored by Excel (exceljs yields UTC midnight). */
 function dateToIso(d: Date): string {
   return d.toISOString().slice(0, 10);
@@ -29,7 +32,15 @@ export function pickSheet(wb: Workbook): Worksheet | undefined {
 export async function parseXlsxBuffer(buffer: ArrayBuffer): Promise<RawTable> {
   const { default: ExcelJS } = await import('exceljs');
   const wb = new ExcelJS.Workbook();
-  await wb.xlsx.load(buffer);
+  try {
+    await wb.xlsx.load(buffer);
+  } catch (cause) {
+    throw new UnreadableFileError(
+      'This file could not be read as an Excel workbook. It may be damaged, password-protected, ' +
+        'or not really an .xlsx file. Re-save it from Excel as .xlsx, or export it as CSV.',
+      { cause },
+    );
+  }
   const ws = pickSheet(wb);
   if (!ws) return recordsToTable([], [{ message: 'The workbook has no worksheets.' }]);
 

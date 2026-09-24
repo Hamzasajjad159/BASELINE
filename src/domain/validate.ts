@@ -70,14 +70,37 @@ function distinct(values: readonly string[]): string[] {
   return [...new Set(values.filter((v) => v !== ''))];
 }
 
-function headerIssues(resolution: HeaderResolution): ValidationIssue[] {
+const TEMPLATE_HINT = 'Download the CSV or Excel template to see the expected columns.';
+
+function headerIssues(headers: readonly string[], resolution: HeaderResolution): ValidationIssue[] {
+  if (headers.every((h) => h.trim() === '')) {
+    return [
+      fileIssue(
+        'error',
+        'EMPTY_FILE',
+        `The file is empty: no header row was found. ${TEMPLATE_HINT}`,
+      ),
+    ];
+  }
+  if (Object.keys(resolution.mapping).length === 0) {
+    const shown = resolution.unknown.slice(0, 5).join(', ');
+    const more = resolution.unknown.length > 5 ? ', …' : '';
+    return [
+      fileIssue(
+        'error',
+        'NO_RECOGNIZED_COLUMNS',
+        `None of the column headers were recognized (found: ${shown}${more}). ` +
+          `Check that this is a BOM export. ${TEMPLATE_HINT}`,
+      ),
+    ];
+  }
   const issues: ValidationIssue[] = [];
   if (resolution.missingRequired.length > 0) {
     issues.push(
       fileIssue(
         'error',
         'MISSING_COLUMNS',
-        `Missing required column(s): ${resolution.missingRequired.join(', ')}.`,
+        `Missing required column(s): ${resolution.missingRequired.join(', ')}. ${TEMPLATE_HINT}`,
       ),
     );
   }
@@ -280,7 +303,7 @@ export function validateFile(
 ): FileValidation {
   const resolution = resolveHeaders(table.headers);
   const issues: ValidationIssue[] = [
-    ...headerIssues(resolution),
+    ...headerIssues(table.headers, resolution),
     ...table.parseWarnings.map((w) =>
       w.sourceRow === undefined
         ? fileIssue('warning', 'PARSE_WARNING', w.message)
@@ -297,10 +320,11 @@ export function validateFile(
     blocking: false,
   };
 
-  if (table.rows.length === 0) {
-    issues.push(fileIssue('error', 'NO_ROWS', 'The file has no data rows.'));
+  const emptyFile = issues.some((i) => i.code === 'EMPTY_FILE');
+  if (table.rows.length === 0 && !emptyFile) {
+    issues.push(fileIssue('error', 'NO_ROWS', 'The file has a header row but no data rows.'));
   }
-  if (resolution.missingRequired.length > 0 || table.rows.length === 0) {
+  if (hasBlockingIssues(issues)) {
     result.blocking = true;
     return result;
   }
