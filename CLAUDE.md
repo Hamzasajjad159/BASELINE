@@ -66,6 +66,8 @@ tests/
 public/samples/
   sample_version_A.csv / .xlsx
   sample_version_B.csv / .xlsx   # hand-crafted to trigger every change type
+scripts/
+  build-samples.mjs   # npm run samples: CSV samples -> XLSX (CSV is the source of truth)
 ```
 
 ## Template (single source of truth in `template.ts`)
@@ -228,7 +230,7 @@ No backend, no login, no database, no ERP/CAD connectors, no trust score, no pro
 2. **Domain**: types, template definition + aliases, template download (CSV + text-formatted XLSX).
 3. **Parse (CSV + XLSX) + normalize + validate + dedupe**, with unit tests.
 4. **Diff engine**, with unit tests covering every change type, duplicate-group pairing, MOVED (the single-parent rule and the ambiguous case staying ADDED/REMOVED), config add/remove grouping, and `ignoreFields`.
-5. **Sample data**: A and B files (CSV + XLSX) that trigger every change type at least once. 30–60 rows, 2 configurations, 3 levels, and one repeated subassembly.
+5. **Sample data**: A and B files (CSV + XLSX) that trigger every change type at least once. 30–60 rows, 2 main configurations (plus one only in A and one only in B, for CONFIG_REMOVED / CONFIG_ADDED), 3 levels, and one repeated subassembly. `tests/samples.test.ts` enforces all of this.
 6. **UI**: upload → validation → summary → config compare → diff table → drawer.
 7. **Export** the report as CSV and XLSX.
 8. **Polish**: empty states, error messages, and a perf test (5,000 rows diff in under 1 s in Vitest). Also check table scrolling manually.
