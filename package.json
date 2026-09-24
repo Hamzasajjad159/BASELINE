@@ -16,6 +16,7 @@
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "exceljs": "^4.4.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0"
   },
@@ -38,5 +39,8 @@
     "typescript-eslint": "^8.70.1",
     "vite": "^8.3.1",
     "vitest": "^5.0.1"
+  },
+  "overrides": {
+    "uuid": "^11.1.1"
   }
 }

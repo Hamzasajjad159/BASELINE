@@ -19,7 +19,7 @@ Design principle: the diff engine compares two normalized snapshots, whatever th
 - Tailwind CSS v4 via `@tailwindcss/vite`
 - ESLint (typescript-eslint strict) + Prettier
 - `papaparse` for CSV parsing (with `comments: '#'`)
-- `exceljs` for XLSX: parsing uploads, the template download, and the report export. Load it with a dynamic `import()` so it stays out of the initial bundle. (SheetJS is not used: the npm copy, 0.18.5, has known vulnerabilities, and its CDN is not reachable from the build environment.)
+- `exceljs` for XLSX: parsing uploads, the template download, and the report export. Load it with a dynamic `import()` so it stays out of the initial bundle. (SheetJS is not used: the npm copy, 0.18.5, has known vulnerabilities, and its CDN is not reachable from the build environment.) `package.json` overrides `uuid` to `^11.1.1` to clear a moderate advisory in exceljs's transitive dependency.
 - `@tanstack/react-virtual` for the diff table
 - Vitest + `@vitest/coverage-v8`. `src/domain/**` has a 100% coverage threshold, enforced by `npm run coverage`.
 - GitHub Actions CI (`.github/workflows/ci.yml`) runs lint, format check, coverage and build. It has no deploy step yet.

@@ -7,6 +7,10 @@ export default defineConfig({
   // Relative base so the static build works from any path (GitHub Pages, S3, file share).
   base: './',
   plugins: [react(), tailwindcss()],
+  build: {
+    // exceljs (~930 kB) is lazy-loaded on first Excel use, never in the initial bundle.
+    chunkSizeWarningLimit: 1000,
+  },
   test: {
     include: ['tests/**/*.test.ts'],
     environment: 'node',
