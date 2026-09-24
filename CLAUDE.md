@@ -19,7 +19,7 @@ Design principle: the diff engine compares two normalized snapshots, whatever th
 - Tailwind CSS v4 via `@tailwindcss/vite`
 - ESLint (typescript-eslint strict) + Prettier
 - `papaparse` for CSV parsing (with `comments: '#'`)
-- `exceljs` for XLSX: parsing uploads, the template download, and the report export. Load it with a dynamic `import()` so it stays out of the initial bundle. (SheetJS is not used: the npm copy, 0.18.5, has known vulnerabilities, and its CDN is not reachable from the build environment.)
+- `exceljs` for XLSX: parsing uploads, the template download, and the report export. Load it with a dynamic `import()` so it stays out of the initial bundle. (SheetJS is not used: the npm copy, 0.18.5, has known vulnerabilities, and its CDN is not reachable from the build environment.) `package.json` overrides `uuid` to `^11.1.1` to clear a moderate advisory in exceljs's transitive dependency.
 - `@tanstack/react-virtual` for the diff table
 - Vitest + `@vitest/coverage-v8`. `src/domain/**` has a 100% coverage threshold, enforced by `npm run coverage`.
 - GitHub Actions CI (`.github/workflows/ci.yml`) runs lint, format check, coverage and build. It has no deploy step yet.
@@ -90,7 +90,7 @@ The downloadable CSV and XLSX are generated from this definition. Never hand-mai
 | reference_designator | no       | string            |                                                     |
 | notes                | no       | string            | Ignored by the diff                                 |
 
-- **Header aliases:** each column has a list of aliases (e.g. `part_number` ← "Part Number", "PN", "Part No", "Item Number"; `quantity` ← "Qty"). Header matching ignores case, spaces, `_`, `-` and `.`. Unknown headers are ignored and listed as an info note.
+- **Header aliases:** each column has a list of aliases (e.g. `part_number` ← "Part Number", "PN", "Part No"; `find_number` ← "Item No", "Item Number" (SolidWorks convention); `quantity` ← "Qty"). Header matching ignores case, spaces, `_`, `-` and `.`. Unknown headers are ignored and listed as an info note.
 - **XLSX template:** every data column is formatted as Text (`numFmt '@'`) so Excel does not strip leading zeros or convert part numbers and dates. It includes a second "Instructions" sheet with column descriptions and one example row.
 - **CSV template:** a header row plus one example row prefixed with `#`. The parser uses `comments: '#'`, so the example is skipped.
 
