@@ -90,7 +90,7 @@ The downloadable CSV and XLSX are generated from this definition. Never hand-mai
 | reference_designator | no       | string            |                                                     |
 | notes                | no       | string            | Ignored by the diff                                 |
 
-- **Header aliases:** each column has a list of aliases (e.g. `part_number` ← "Part Number", "PN", "Part No", "Item Number"; `quantity` ← "Qty"). Header matching ignores case, spaces, `_`, `-` and `.`. Unknown headers are ignored and listed as an info note.
+- **Header aliases:** each column has a list of aliases (e.g. `part_number` ← "Part Number", "PN", "Part No"; `find_number` ← "Item No", "Item Number" (SolidWorks convention); `quantity` ← "Qty"). Header matching ignores case, spaces, `_`, `-` and `.`. Unknown headers are ignored and listed as an info note.
 - **XLSX template:** every data column is formatted as Text (`numFmt '@'`) so Excel does not strip leading zeros or convert part numbers and dates. It includes a second "Instructions" sheet with column descriptions and one example row.
 - **CSV template:** a header row plus one example row prefixed with `#`. The parser uses `comments: '#'`, so the example is skipped.
 
