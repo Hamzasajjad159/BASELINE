@@ -18,7 +18,7 @@ Design principle: the diff engine compares two normalized snapshots, whatever th
 - Vite + React + TypeScript (strict mode, `noUncheckedIndexedAccess`). TypeScript is pinned to 6.0.x until typescript-eslint supports TS 7.
 - Tailwind CSS v4 via `@tailwindcss/vite`
 - ESLint (typescript-eslint strict) + Prettier
-- `papaparse` for CSV parsing (with `comments: '#'`)
+- `papaparse` for CSV parsing. Every record is kept so that record index + 1 equals the spreadsheet row number; blank rows and rows whose first cell starts with `#` are skipped afterwards (equivalent to `comments: '#'`). The delimiter (`,` `;` or tab) is detected from the header line, because papaparse's detection is confused by the `#` line.
 - `exceljs` for XLSX: parsing uploads, the template download, and the report export. Load it with a dynamic `import()` so it stays out of the initial bundle. (SheetJS is not used: the npm copy, 0.18.5, has known vulnerabilities, and its CDN is not reachable from the build environment.) `package.json` overrides `uuid` to `^11.1.1` to clear a moderate advisory in exceljs's transitive dependency.
 - `@tanstack/react-virtual` for the diff table
 - Vitest + `@vitest/coverage-v8`. `src/domain/**` has a 100% coverage threshold, enforced by `npm run coverage`.
@@ -35,11 +35,14 @@ src/
     normalize.ts      # identifier + value normalization
     validate.ts       # per-row, per-file and cross-file validation (incl. structure checks)
     dedupe.ts         # collapse repeated expansions of the same subassembly
+    keys.ts           # matchKey / relationKey
+    csv.ts            # CSV writer with formula-injection guard
     diff.ts           # pure diff engine: (A, B, options) => DiffResult
     report.ts         # DiffResult => report rows (CSV text; sheet data for XLSX)
   io/
     parseCsv.ts       # File/text -> RawTable
-    parseXlsx.ts      # File/ArrayBuffer -> RawTable (same shape as CSV)
+    parseXlsx.ts      # File/ArrayBuffer -> RawTable (same shape as CSV); sheet "BOM" else first
+    rawTable.ts       # shared record -> RawTable logic (header detection, skipping)
     readFile.ts       # dispatch on extension, SHA-256 of raw bytes via crypto.subtle
     downloadTemplate.ts
     exportReport.ts
@@ -102,7 +105,8 @@ Apply the same rules to both snapshots before any comparison:
 - Uppercase part_number, parent_part_number, assembly_number, and uom.
 - Strip leading zeros from find_number and sequence_number. This is configurable; default is on.
 - Parse quantity as a decimal and compare with a tolerance of 1e-9.
-- Normalize dates to ISO format. Accept YYYY-MM-DD, JS `Date` values from XLSX, and Excel serial numbers. Blank effectivity_end means open-ended.
+- Normalize dates to ISO format. Accept YYYY-MM-DD (also `/` or `.` separators), JS `Date` values from XLSX, and Excel serial numbers from 61 (1900-03-01) upward. Ambiguous forms like `03/04/2026` are rejected. Blank effectivity_end means open-ended.
+- Invalid values (non-numeric quantity, level < 1, bad dates) normalize to `null`; `validate.ts` reports them once.
 - Warn when a part_number looks mangled by Excel (scientific notation such as `1.23E+05`).
 - Keep the raw row and its source row number on every normalized row for display.
 
@@ -112,7 +116,7 @@ Validation blocks the comparison only on file-level errors. Row-level problems a
 
 - File level (per file): missing required columns (after alias resolution), zero data rows, or more than one assembly_number in a file.
 - Cross-file: A and B have different assembly_number values. This is an error and blocks the comparison.
-- Row level: missing required value, non-numeric or non-positive quantity, bad level, bad date, effectivity_end earlier than effectivity_start, make_buy not MAKE/BUY.
+- Row level: missing required value, non-numeric or non-positive quantity, bad level, bad date, effectivity_end earlier than effectivity_start, make_buy not MAKE/BUY. Rows missing configuration_name, parent_part_number or part_number cannot be matched and are excluded from the comparison (the message says so).
 - Row level (structure warnings): parent_part_number does not appear as a part_number (or as the assembly_number) in the same configuration; a child's level is not its parent's level + 1.
 - Row level: duplicate matching key within one file after deduplication. This is shown as a warning because it makes matching ambiguous.
 - Show row count and a SHA-256 checksum per file. If B has more than 2% fewer rows than A, show a banner that suggests the extraction may be incomplete.
