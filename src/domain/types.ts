@@ -37,8 +37,10 @@ export interface ColumnDef {
 export interface RawTable {
   headers: string[];
   rows: Record<string, string>[];
-  /** 1-based source line/row number of each data row, parallel to `rows`. */
+  /** 1-based source row number of each data row (as a spreadsheet shows it), parallel to `rows`. */
   sourceRows: number[];
+  /** Non-fatal problems found while reading the file (e.g. malformed quotes). */
+  parseWarnings: { sourceRow?: number; message: string }[];
 }
 
 /** A row after header resolution: every template column present as a (possibly empty) string. */

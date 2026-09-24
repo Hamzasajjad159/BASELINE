@@ -14,7 +14,7 @@ const VALIDATION_ROWS = 5000;
 
 export function downloadCsvTemplate(): void {
   // BOM so Excel opens the UTF-8 file with the right encoding.
-  const blob = new Blob(['﻿', buildCsvTemplate()], { type: 'text/csv;charset=utf-8' });
+  const blob = new Blob(['\uFEFF', buildCsvTemplate()], { type: 'text/csv;charset=utf-8' });
   downloadBlob(blob, 'baseline_bom_template.csv');
 }
 

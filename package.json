@@ -16,7 +16,9 @@
     "coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@types/papaparse": "^5.5.2",
     "exceljs": "^4.4.0",
+    "papaparse": "^5.7.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0"
   },
