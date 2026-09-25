@@ -1,5 +1,7 @@
 # Baseline — BOM Compare MVP
 
+> **New session?** Read `docs/HANDOFF.md` first: current status, decisions and their reasons, the PR workflow, environment gotchas and next steps.
+
 ## Purpose
 
 A client-side single-page app that demonstrates Baseline's minimum workflow:
@@ -73,6 +75,8 @@ tests/
   samples.test.ts     # sample files trigger every change type; XLSX/CSV parity
   report.test.ts      # report tables, CSV and XLSX export
   view.test.ts        # table filtering
+docs/
+  HANDOFF.md          # session handoff: status, decisions, workflow, next steps
 public/samples/
   sample_version_A.csv / .xlsx
   sample_version_B.csv / .xlsx   # hand-crafted to trigger every change type
